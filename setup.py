@@ -23,7 +23,10 @@ setup(
     
     long_description = """A GUI for getting immediate feedback while constructing
 and troubleshooting pyparsing grammars.  Analogous to tools like Kodos 
-for regular expressions.""",
+for regular expressions.
+
+Mercurial repository and issue tracking
+at http://www.assembla.com/spaces/pyparsing_helper/""",
 
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
