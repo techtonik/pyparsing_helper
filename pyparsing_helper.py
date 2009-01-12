@@ -11,7 +11,7 @@ By Catherine Devlin (http://catherinedevlin.blogspot.com)
 from Tkinter import *
 from command_seq_reader import last_assignment_or_evaluatable
 import pyparsing
-import time, threading, functools, string, optparse
+import time, threading, functools, string, optparse, sys
 __version__ = '0.1'
 
 optparser = optparse.OptionParser()
@@ -43,6 +43,9 @@ class Application(Frame):
             self.set_all_results('')
             self.restart_timer()
         
+    def paste(self, event):
+        event.widget.insert(CURRENT, self.clipboard_get())
+    
     def keypress_i(self, event, i):
         if event.keysym in string.printable:
             self.set_result(i, '')
@@ -117,7 +120,9 @@ class Application(Frame):
         Label(self, text='Result').grid(column=2, row=4)
         self.grammar_text = Text(self, width=self.grammar_width, height=self.grammar_height)
         self.grammar_text.bind("<FocusOut>", self.reparse)
-        self.grammar_text.bind("<Any-KeyPress>", self.keypress)        
+        self.grammar_text.bind("<Any-KeyPress>", self.keypress)
+        if not sys.platform[:3] == 'win':
+            self.grammar_text.bind("<Control-v>", self.paste)
         self.grammar_text.grid(column=0, row=5, rowspan = self.num_targets)
         for target_num in range(0, self.num_targets):
             tgt = Text(self, height=self.grammar_height / self.num_targets, width=self.grammar_width)
@@ -125,6 +130,8 @@ class Application(Frame):
             tgt.bind("<Any-KeyPress>", reparser)        
             tgt.bind("<FocusOut>", self.reparse)
             tgt.grid(column=1, row = 5 + target_num)
+            if not sys.platform[:3] == 'win':
+                tgt.bind("<Control-v>", self.paste)            
             setattr(self, "target_text%d" % target_num, tgt)
             scrl = Scrollbar(self)
             scrl.grid(column=3, row = 5 + target_num)
