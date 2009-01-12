@@ -53,6 +53,8 @@ class Application(Frame):
             target = getattr(self, 'target_text%d' % i).get(1.0, END)
             if self.parse_type.get() == 'scan':
                 result = '\n----------\n'.join(r[0].dump() for r in self.grammar.scanString(target))
+            elif self.parse_type.get() == 'transform':
+                result = self.grammar.transformString(target)
             else:                
                 result = self.grammar.parseString(target).dump()
         except Exception, e:
@@ -100,34 +102,35 @@ class Application(Frame):
         self.parse_type_button1 = Radiobutton(self, variable=self.parse_type,
                                               value="parse", text="parse", command=self.reparse)
         self.parse_type_button2 = Radiobutton(self, variable=self.parse_type,
-                                              value="scan", text="scan", command=self.reparse)
-        self.parse_type_button1.bind("<Activate>", self.reparse)
-        self.parse_type_button2.bind("<Activate>", self.reparse)
+                                              value="scan", text="scan/search", command=self.reparse)
+        self.parse_type_button3 = Radiobutton(self, variable=self.parse_type,
+                                              value="transform", text="transform", command=self.reparse)
         self.parse_type_button1.grid(column=1, row=0)
         self.parse_type_button2.grid(column=1, row=1)
+        self.parse_type_button3.grid(column=1, row=2)
         self.go_button = Button(self, text='go')
         self.go_button.bind("<Button-1>", self.reparse)
         self.go_button.bind("<KeyPress-Return>", self.reparse)
         self.go_button.grid(column=2, row=0)
-        Label(self, text='Grammar').grid(column=0, row=3)
-        Label(self, text='Target').grid(column=1, row=3)
-        Label(self, text='Result').grid(column=2, row=3)
+        Label(self, text='Grammar').grid(column=0, row=4)
+        Label(self, text='Target').grid(column=1, row=4)
+        Label(self, text='Result').grid(column=2, row=4)
         self.grammar_text = Text(self, width=self.grammar_width, height=self.grammar_height)
         self.grammar_text.bind("<FocusOut>", self.reparse)
         self.grammar_text.bind("<Any-KeyPress>", self.keypress)        
-        self.grammar_text.grid(column=0, row=4, rowspan = self.num_targets)
+        self.grammar_text.grid(column=0, row=5, rowspan = self.num_targets)
         for target_num in range(0, self.num_targets):
             tgt = Text(self, height=self.grammar_height / self.num_targets, width=self.grammar_width)
             reparser = functools.partial(self.keypress_i, i=target_num)
             tgt.bind("<Any-KeyPress>", reparser)        
             tgt.bind("<FocusOut>", self.reparse)
-            tgt.grid(column=1, row = 4 + target_num)
+            tgt.grid(column=1, row = 5 + target_num)
             setattr(self, "target_text%d" % target_num, tgt)
             scrl = Scrollbar(self)
-            scrl.grid(column=3, row = 4 + target_num)
+            scrl.grid(column=3, row = 5 + target_num)
             result = Text(self, height=self.grammar_height / self.num_targets, width=self.grammar_width, 
                           takefocus=0, yscrollcommand=scrl.set)
-            result.grid(column=2, row = 4 + target_num)
+            result.grid(column=2, row = 5 + target_num)
             setattr(self, "result_text%d" % target_num, result)
             scrl.config(command=result.yview)            
         self.last_parse_time = time.time()
