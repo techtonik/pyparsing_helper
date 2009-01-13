@@ -12,7 +12,7 @@ from Tkinter import *
 from command_seq_reader import last_assignment_or_evaluatable
 import pyparsing
 import time, threading, functools, string, optparse, sys
-__version__ = '0.1'
+__version__ = '0.1.1'
 
 optparser = optparse.OptionParser()
 optparser.add_option("-n", "--num-targets", help="Number of target panes to display",
