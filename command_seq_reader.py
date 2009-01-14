@@ -15,33 +15,37 @@ referred to in a stack of Python commands.
 """
 
 import unittest, doctest, re
-
-commandUnfinished = re.compile('unexpected EOF while parsing|EOL while scanning|unexpected character after line continuation character')
+        
+commandUnfinished = re.compile('unexpected EOF while parsing|EOL while scanning|unexpected character after line continuation character|invalid syntax')
                     
 def items_of_interest(dct, types_of_interest):
     return [(k, v) for (k, v) in dct.items() if isinstance(v, types_of_interest)]
 
 def recordingexec(arg, types_of_interest = (int, basestring)):
     cmdbuf = []
+    lastcmd = ''
+    commandInProgress = []
     lastlocals = []
     for line in arg.strip().splitlines():
         cmdbuf.append(line)
+        commandInProgress.append(line)
         try:
             oldlocals = items_of_interest(locals(), types_of_interest)
-            commnd = '\n'.join(cmdbuf)
-            exec(commnd)
+            exec('\n'.join(cmdbuf))
             newlocals = [itm for itm in 
                          items_of_interest(locals(), types_of_interest)
                          if itm not in oldlocals]
             if newlocals:
                 lastlocals = newlocals
-            lastcmd = '\n'.join(cmdbuf)
-            cmdbuf = []
+            lastcmd = '\n'.join(commandInProgress)
+            commandInProgress = []
+        except IndentationError:
+            pass            
         except SyntaxError, e:
             if not commandUnfinished.search(str(e)):
                 raise
         except Exception, e:
-            raise Exception, '%s:\n%s' % (e, commnd)
+            raise Exception, '%s:\n%s' % (e, line)
     return (lastcmd, dict(lastlocals))
                    
 def last_assignment_or_evaluatable(s, types_of_interest=(basestring, int, float)):
