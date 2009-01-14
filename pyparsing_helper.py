@@ -25,7 +25,8 @@ optparser.add_option("-w", "--width", help="Width of pane (in characters)",
 class Application(Frame):
     grammar_height=40
     recalc_lag = 3.0
-    def __init__(self, master=None, grammar_width=40, grammar_height=40, num_targets=3):
+    def __init__(self, master=None, grammar_width=40, grammar_height=40, num_targets=3,
+                 grammar = None):
         Frame.__init__(self, master)
         self.grid()
         self.recalc_timer = None
@@ -33,6 +34,9 @@ class Application(Frame):
         self.grammar_width = grammar_width
         self.num_targets = num_targets
         self.createWidgets()
+        if grammar:
+            self.grammar_text.insert(END, grammar)
+        
     def restart_timer(self):
         if self.recalc_timer:
             self.recalc_timer.cancel()
@@ -84,7 +88,11 @@ class Application(Frame):
                 for i in range(self.num_targets):
                     self.apply_grammar(i)
             except Exception, e:
-                self.set_all_results(str(e))
+                if hasattr(e, 'text'):
+                    errtxt = '%s\n\n%s' % (str(e), e.text)
+                else:
+                    errtxt = str(e)
+                self.set_all_results(errtxt)
         else:
             self.set_all_results('')
         self.restart_timer()
@@ -144,7 +152,12 @@ class Application(Frame):
           
 def main():
     (opts, args) = optparser.parse_args()
-    app = Application(**opts.__dict__)
+    if args:
+        grammarfile = open(args[0])
+        grammar = grammarfile.read()
+    else:
+        grammar = ''
+    app = Application(grammar=grammar, **opts.__dict__)
     app.master.title("PyParsing helper") 
     app.mainloop()
 

@@ -14,8 +14,10 @@ referred to in a stack of Python commands.
 7
 """
 
-import unittest, doctest
+import unittest, doctest, re
 
+commandUnfinished = re.compile('unexpected EOF while parsing|EOL while scanning|unexpected character after line continuation character')
+                    
 def items_of_interest(dct, types_of_interest):
     return [(k, v) for (k, v) in dct.items() if isinstance(v, types_of_interest)]
 
@@ -26,7 +28,8 @@ def recordingexec(arg, types_of_interest = (int, basestring)):
         cmdbuf.append(line)
         try:
             oldlocals = items_of_interest(locals(), types_of_interest)
-            exec('\n'.join(cmdbuf))
+            commnd = '\n'.join(cmdbuf)
+            exec(commnd)
             newlocals = [itm for itm in 
                          items_of_interest(locals(), types_of_interest)
                          if itm not in oldlocals]
@@ -35,9 +38,10 @@ def recordingexec(arg, types_of_interest = (int, basestring)):
             lastcmd = '\n'.join(cmdbuf)
             cmdbuf = []
         except SyntaxError, e:
-            if not (('unexpected EOF while parsing' in str(e) or 
-                    ('EOL while scanning') in str(e) )):
+            if not commandUnfinished.search(str(e)):
                 raise
+        except Exception, e:
+            raise Exception, '%s:\n%s' % (e, commnd)
     return (lastcmd, dict(lastlocals))
                    
 def last_assignment_or_evaluatable(s, types_of_interest=(basestring, int, float)):
