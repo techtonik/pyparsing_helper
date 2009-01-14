@@ -22,6 +22,20 @@ optparser.add_option("-l", "--lines", help="Height of grammar pane (in lines)",
 optparser.add_option("-w", "--width", help="Width of pane (in characters)",
                      dest="grammar_width", default=40, action="store", type="int")
 
+def _eq_monkeypatch(self, other):
+    if isinstance(other, pyparsing.ParserElement):
+        return self.__dict__ == other.__dict__
+    elif isinstance(other, basestring):
+        try:
+            (self + StringEnd()).parseString(_ustr(other))
+            return True
+        except ParseBaseException:
+            return False
+    else:
+        return super(ParserElement,self)==other
+
+pyparsing.ParserElement.__eq__ = _eq_monkeypatch
+
 class Application(Frame):
     grammar_height=40
     recalc_lag = 3.0
