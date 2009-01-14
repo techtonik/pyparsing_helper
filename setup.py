@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pyparsing_helper",
-    version="0.1.1",
+    version="0.1.2",
     py_modules=["pyparsing_helper","command_seq_reader"],
     
     # metadata for upload to PyPI
