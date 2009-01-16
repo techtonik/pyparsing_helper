@@ -55,6 +55,7 @@ class Application(Frame):
         if self.recalc_timer:
             self.recalc_timer.cancel()
         self.recalc_timer = threading.Timer(interval=self.recalc_lag, function=self.reparse)
+        self.recalc_timer.start()
         
     def keypress(self, event):
         if event.keysym in string.printable:
@@ -79,7 +80,7 @@ class Application(Frame):
             else:                
                 result = self.grammar.parseString(target).dump()
         except Exception, e:
-            result = str(e)
+            result = '%s\n%s' % (str(e.__class__), str(e))
         self.set_result(i, result)
         
     def set_result(self, i, txt):
