@@ -45,7 +45,7 @@ def recordingexec(arg, types_of_interest = (int, str)):
             if not commandUnfinished.search(str(e)):
                 raise
         except Exception as e:
-            raise Exception('%s:\n%s' % (e, line))
+            raise Exception(f'{e}:\n{line}')
     return (lastcmd, dict(lastlocals))
                    
 def last_assignment_or_evaluatable(s, types_of_interest=(str, int, float)):

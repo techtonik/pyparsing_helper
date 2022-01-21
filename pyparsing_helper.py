@@ -80,7 +80,7 @@ class Application(Frame):
             else:                
                 result = self.grammar.parseString(target).dump()
         except Exception as e:
-            result = '%s\n%s' % (str(e.__class__), str(e))
+            result = f'{e.__class__}\n{e}'
         self.set_result(i, result)
         
     def set_result(self, i, txt):
@@ -97,14 +97,14 @@ class Application(Frame):
     def reparse(self, event=None):
         self.grammar = self.grammar_text.get(1.0, END).strip()
         if self.grammar:
-            self.grammar = '%s\n%s' % (self.import_type.get(), self.grammar)
+            self.grammar = f'{self.import_type.get()}\n{self.grammar}'
             try:
                 self.grammar = last_assignment_or_evaluatable(self.grammar, types_of_interest=(pyparsing.ParserElement))
                 for i in range(self.num_targets):
                     self.apply_grammar(i)
             except Exception as e:
                 if hasattr(e, 'text'):
-                    errtxt = '%s\n\n%s' % (str(e), e.text)
+                    errtxt = f'{e}\n\n{e.text}'
                 else:
                     errtxt = str(e)
                 self.set_all_results(errtxt)
