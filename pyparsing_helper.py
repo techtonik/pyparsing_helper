@@ -29,10 +29,10 @@ def _eq_monkeypatch(self, other):
         try:
             (self + StringEnd()).parseString(_ustr(other))
             return True
-        except ParseBaseException:
+        except pyparsing.ParseBaseException:
             return False
     else:
-        return super(ParserElement,self)==other
+        return super(pyparsing.ParserElement, self) == other
 
 pyparsing.ParserElement.__eq__ = _eq_monkeypatch
 
