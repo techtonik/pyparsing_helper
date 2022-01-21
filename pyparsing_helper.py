@@ -8,7 +8,7 @@ http://pypi.python.org/pypi/pyparsing_helper
 
 By Catherine Devlin (http://catherinedevlin.blogspot.com)
 '''
-from Tkinter import *
+from tkinter import *
 from command_seq_reader import last_assignment_or_evaluatable
 import pyparsing
 import time, threading, functools, string, optparse, sys
@@ -25,7 +25,7 @@ optparser.add_option("-w", "--width", help="Width of pane (in characters)",
 def _eq_monkeypatch(self, other):
     if isinstance(other, pyparsing.ParserElement):
         return self.__dict__ == other.__dict__
-    elif isinstance(other, basestring):
+    elif isinstance(other, str):
         try:
             (self + StringEnd()).parseString(_ustr(other))
             return True
@@ -79,7 +79,7 @@ class Application(Frame):
                 result = self.grammar.transformString(target)
             else:                
                 result = self.grammar.parseString(target).dump()
-        except Exception, e:
+        except Exception as e:
             result = '%s\n%s' % (str(e.__class__), str(e))
         self.set_result(i, result)
         
@@ -102,7 +102,7 @@ class Application(Frame):
                 self.grammar = last_assignment_or_evaluatable(self.grammar, types_of_interest=(pyparsing.ParserElement))
                 for i in range(self.num_targets):
                     self.apply_grammar(i)
-            except Exception, e:
+            except Exception as e:
                 if hasattr(e, 'text'):
                     errtxt = '%s\n\n%s' % (str(e), e.text)
                 else:

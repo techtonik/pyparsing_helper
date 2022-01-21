@@ -21,7 +21,7 @@ commandUnfinished = re.compile('unexpected EOF while parsing|EOL while scanning|
 def items_of_interest(dct, types_of_interest):
     return [(k, v) for (k, v) in dct.items() if isinstance(v, types_of_interest)]
 
-def recordingexec(arg, types_of_interest = (int, basestring)):
+def recordingexec(arg, types_of_interest = (int, str)):
     cmdbuf = []
     lastcmd = ''
     commandInProgress = []
@@ -41,14 +41,14 @@ def recordingexec(arg, types_of_interest = (int, basestring)):
             commandInProgress = []
         except IndentationError:
             pass            
-        except SyntaxError, e:
+        except SyntaxError as e:
             if not commandUnfinished.search(str(e)):
                 raise
-        except Exception, e:
-            raise Exception, '%s:\n%s' % (e, line)
+        except Exception as e:
+            raise Exception('%s:\n%s' % (e, line))
     return (lastcmd, dict(lastlocals))
                    
-def last_assignment_or_evaluatable(s, types_of_interest=(basestring, int, float)):
+def last_assignment_or_evaluatable(s, types_of_interest=(str, int, float)):
     s = s.strip()
     if not s:
         return None
@@ -56,12 +56,12 @@ def last_assignment_or_evaluatable(s, types_of_interest=(basestring, int, float)
     (lastcmd, lastlocals) = recordingexec(s, types_of_interest)
     try:
         return eval(lastcmd)
-    except SyntaxError, e:
+    except SyntaxError as e:
         if 'invalid syntax' not in str(e):
             raise
     if len(lastlocals) > 1:
-        raise ValueError, "Multiple assignments - couldn't determine which one"
-    return eval(lastlocals.keys()[0])
+        raise ValueError("Multiple assignments - couldn't determine which one")
+    return eval(next(lastlocals.keys()))
 
 class RecordingExecTestSuite(unittest.TestCase):
     def testSimpleAssignments(self):
@@ -78,7 +78,7 @@ b = 2
 uts = unittest.TestSuite()
 ''', (unittest.TestSuite))
         self.assertEqual(lastcmd, 'uts = unittest.TestSuite()')
-        self.assertEqual(lastlocals.keys(), ['uts'])
+        self.assertEqual(list(lastlocals.keys()), ['uts'])
     def testExecutableLastLine(self):
         (lastcmd, lastlocals) = recordingexec('''
 a = 1
